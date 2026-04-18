@@ -5,7 +5,6 @@ visible in Teams/Outlook, including on Windows native and iOS.
 Events synced from any device (Windows, iOS, Android, web) are accessible.
 """
 
-import json
 import os
 import logging
 from datetime import datetime, timedelta, timezone
@@ -28,7 +27,7 @@ def _build_msal_app() -> msal.PublicClientApplication:
     """Build an MSAL public client with persistent token cache."""
     cache = msal.SerializableTokenCache()
     if os.path.exists(TOKEN_CACHE_FILE):
-        with open(TOKEN_CACHE_FILE, "r") as f:
+        with open(TOKEN_CACHE_FILE, "r", encoding="utf-8") as f:
             cache.deserialize(f.read())
 
     app = msal.PublicClientApplication(
@@ -42,7 +41,7 @@ def _build_msal_app() -> msal.PublicClientApplication:
 def _save_cache(app: msal.PublicClientApplication) -> None:
     """Persist the MSAL token cache to disk."""
     if app.token_cache.has_state_changed:
-        with open(TOKEN_CACHE_FILE, "w") as f:
+        with open(TOKEN_CACHE_FILE, "w", encoding="utf-8") as f:
             f.write(app.token_cache.serialize())
 
 
@@ -70,7 +69,7 @@ def _get_access_token() -> str:
         raise RuntimeError(f"Device code flow failed: {flow.get('error_description', 'unknown error')}")
 
     print(f"\n{'=' * 60}")
-    print(f"Microsoft sign-in required.")
+    print("Microsoft sign-in required.")
     print(f"1. Open: {flow['verification_uri']}")
     print(f"2. Enter code: {flow['user_code']}")
     print(f"{'=' * 60}\n")
