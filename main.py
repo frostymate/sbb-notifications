@@ -16,7 +16,7 @@ from config import (
 )
 from calendar_client import get_calendar_service, fetch_upcoming_events as google_fetch_events
 from sbb_parser import parse_event, Journey, Leg
-from transport_client import fetch_connection, find_best_connection, connection_to_legs
+from transport_client import fetch_connection, find_best_connection, connection_to_legs, build_sbb_url
 from notifier import send_notification
 
 logging.basicConfig(
@@ -40,6 +40,11 @@ class JourneyMonitor:
         self.notified_delays: dict[str, int] = {}  # key → last notified delay
         self.last_refresh: datetime | None = None
         self.refresh_interval = timedelta(minutes=2)  # re-fetch real-time data every 2 min
+
+    @property
+    def sbb_url(self) -> str:
+        """SBB timetable URL for the monitored journey."""
+        return build_sbb_url(self.journey.origin, self.journey.destination, self.journey.departure)
 
     async def enrich_with_realtime(self) -> None:
         """Fetch full stop list + real-time data from transport API."""
@@ -89,6 +94,7 @@ class JourneyMonitor:
                     f"{new.train_type or ''} {new.train_number or ''} at {new.from_station}: "
                     f"Gl. {old.departure_platform} → Gl. {new.departure_platform}",
                     urgency="critical",
+                    url=self.sbb_url,
                 )
                 logger.info(f"⚠️ Platform change at {new.from_station}: {old.departure_platform} → {new.departure_platform}")
 
@@ -97,6 +103,7 @@ class JourneyMonitor:
                     f"⚠️ {self.journey.origin} → {self.journey.destination}: Platform change!",
                     f"Arrival at {new.to_station}: Gl. {old.arrival_platform} → Gl. {new.arrival_platform}",
                     urgency="critical",
+                    url=self.sbb_url,
                 )
                 logger.info(f"⚠️ Platform change at {new.to_station}: {old.arrival_platform} → {new.arrival_platform}")
 
@@ -110,6 +117,7 @@ class JourneyMonitor:
                     f"{new.train_type or ''} {new.train_number or ''} from {new.from_station}: "
                     f"+{new_delay} min delay",
                     urgency="critical",
+                    url=self.sbb_url,
                 )
                 self.notified_delays[delay_key] = new_delay
                 logger.info(f"⏱️ Delay: {new.from_station} +{new_delay} min")
@@ -137,6 +145,7 @@ class JourneyMonitor:
                             f"Arriving at {leg.to_station}{self._format_platform(leg.arrival_platform)} in ~{int(time_until.total_seconds() / 60)} min.\n"
                             f"Next: {next_leg.train_type or ''} {next_leg.train_number or ''} → {next_leg.to_station}{platform_info}{delay_info}",
                             urgency="critical",
+                            url=self.sbb_url,
                         )
                         self.notified_stops.add(transfer_key)
                         logger.info(f"🔄 Notified: transfer at {leg.to_station}")
@@ -162,6 +171,7 @@ class JourneyMonitor:
                         f"{self.journey.destination}{platform_info} in ~{int(time_until.total_seconds() / 60)} min.{delay_info} "
                         f"Get ready to exit!",
                         urgency="critical",
+                        url=self.sbb_url,
                     )
                     self.notified_arrival = True
                     logger.info(f"🎯 Notified: arriving at {self.journey.destination}")

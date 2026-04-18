@@ -2,9 +2,24 @@
 
 import httpx
 from datetime import datetime
+from urllib.parse import quote
+
 from sbb_parser import Leg, Stop
 
 API_BASE = "https://transport.opendata.ch/v1"
+
+SBB_TIMETABLE_URL = "https://www.sbb.ch/en/timetable.html"
+
+
+def build_sbb_url(from_station: str, to_station: str, departure: datetime) -> str:
+    """Build an SBB timetable URL for a journey."""
+    params = (
+        f"from={quote(from_station)}"
+        f"&to={quote(to_station)}"
+        f"&date={departure.strftime('%Y-%m-%d')}"
+        f"&time={departure.strftime('%H:%M')}"
+    )
+    return f"{SBB_TIMETABLE_URL}?{params}"
 
 
 async def resolve_station(name: str) -> dict | None:
