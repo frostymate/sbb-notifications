@@ -1,4 +1,4 @@
-"""SBB-Not — Swiss public transport arrival reminder daemon.
+"""Gleis — Swiss public transport arrival reminder daemon.
 
 Monitors your Google Calendar for SBB journey events and sends desktop
 notifications before your arrival or transfer.
@@ -24,7 +24,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%H:%M:%S",
 )
-logger = logging.getLogger("sbb-not")
+logger = logging.getLogger("gleis")
 
 TZ = ZoneInfo(TIMEZONE)
 
@@ -218,7 +218,7 @@ class SBBNotDaemon:
 
     async def run(self) -> None:
         """Main loop."""
-        logger.info("🚆 SBB-Not starting...")
+        logger.info("🚆 Gleis starting...")
         logger.info("Authenticating with Google Calendar...")
 
         try:
@@ -231,7 +231,7 @@ class SBBNotDaemon:
         logger.info(f"Watching for SBB events (notify {NOTIFY_MINUTES_BEFORE} min before stops)")
         logger.info("Press Ctrl+C to stop\n")
 
-        send_notification("🚆 SBB-Not", "Monitoring your calendar for train journeys...")
+        send_notification("🚆 Gleis", "Monitoring your calendar for train journeys...")
 
         while True:
             now = datetime.now(TZ)
@@ -272,7 +272,7 @@ def main():
     try:
         asyncio.run(daemon.run())
     except KeyboardInterrupt:
-        logger.info("\n👋 SBB-Not stopped. Safe travels!")
+        logger.info("\n👋 Gleis stopped. Safe travels!")
 
 
 if __name__ == "__main__":

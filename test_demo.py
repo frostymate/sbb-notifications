@@ -15,12 +15,12 @@ now = datetime.now(TZ)
 def demo_notifications():
     """Show what each notification type looks like."""
     print("=" * 60)
-    print("SBB-Not Notification Demo")
+    print("Gleis Notification Demo")
     print("=" * 60)
 
     # 1. Startup notification
     print("\n[1/5] Startup notification...")
-    send_notification("🚆 SBB-Not", "Monitoring your calendar for train journeys...")
+    send_notification("🚆 Gleis", "Monitoring your calendar for train journeys...")
     time.sleep(2)
 
     # 2. Transfer notification with platform

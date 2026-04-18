@@ -1,18 +1,18 @@
-# 🚆 SBB-Not — Swiss Transit Arrival Reminder
+# 🚆 Gleis — Swiss Transit Arrival Reminder
 
-Never miss your stop again! SBB-Not monitors your Google Calendar for SBB journey events and sends desktop notifications before your arrival or transfer.
+Never miss your stop again! Gleis monitors your Google Calendar for SBB journey events and sends desktop notifications before your arrival or transfer.
 
 ## How It Works
 
 ```
 📱 SBB App → "Add to Calendar" → Google Calendar
     ↓ (syncs automatically)
-💻 SBB-Not daemon reads your calendar → fetches real-time data → notifies you
+💻 Gleis daemon reads your calendar → fetches real-time data → notifies you
 ```
 
 1. Plan your route in the SBB app as usual
 2. Tap **"Add to Calendar"** — the event syncs to Google Calendar
-3. SBB-Not detects the event, fetches the full route with real-time delays
+3. Gleis detects the event, fetches the full route with real-time delays
 4. You get a desktop notification **2 minutes before** your stop or transfer
 
 ## Features
@@ -52,29 +52,29 @@ On first run, you'll be prompted to complete Google OAuth in the browser. After 
 
 ### Run in Background (Windows)
 
-To run SBB-Not automatically at login as a background service:
+To run Gleis automatically at login as a background service:
 
 ```powershell
 # Register scheduled task (one-time setup)
 powershell -ExecutionPolicy Bypass -File .\install_task.ps1
 
 # Start immediately
-Start-ScheduledTask -TaskName "SBB-Not"
+Start-ScheduledTask -TaskName "Gleis"
 ```
 
 The task starts at every login, runs silently, and auto-restarts on failure.
 
 ```powershell
 # Manage the task
-Get-ScheduledTask -TaskName "SBB-Not"          # Check status
-Stop-ScheduledTask -TaskName "SBB-Not"         # Stop
-Start-ScheduledTask -TaskName "SBB-Not"        # Start
-Unregister-ScheduledTask -TaskName "SBB-Not"   # Remove
+Get-ScheduledTask -TaskName "Gleis"          # Check status
+Stop-ScheduledTask -TaskName "Gleis"         # Stop
+Start-ScheduledTask -TaskName "Gleis"        # Start
+Unregister-ScheduledTask -TaskName "Gleis"   # Remove
 ```
 
 ### 4. Add SBB Trips to Calendar
 
-In the SBB app, after searching a route, tap **"Add to Calendar"**. SBB-Not will detect it automatically.
+In the SBB app, after searching a route, tap **"Add to Calendar"**. Gleis will detect it automatically.
 
 ## Configuration (.env)
 
@@ -89,7 +89,7 @@ In the SBB app, after searching a route, tap **"Add to Calendar"**. SBB-Not will
 
 ## How Events Are Detected
 
-SBB-Not identifies SBB events by looking for:
+Gleis identifies SBB events by looking for:
 - Swiss station names (Zürich, Bern, Basel, etc.)
 - Train type codes (IC, IR, RE, S-Bahn)
 - "Origin - Destination" title pattern

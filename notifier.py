@@ -4,7 +4,7 @@ import platform
 import subprocess
 import logging
 
-logger = logging.getLogger("sbb-not")
+logger = logging.getLogger("gleis")
 
 
 def _send_windows_toast(title: str, message: str) -> None:
@@ -16,7 +16,7 @@ $textNodes = $template.GetElementsByTagName('text')
 $textNodes.Item(0).AppendChild($template.CreateTextNode('{title.replace("'", "''")}')) > $null
 $textNodes.Item(1).AppendChild($template.CreateTextNode('{message.replace("'", "''")}')) > $null
 $toast = [Windows.UI.Notifications.ToastNotification]::new($template)
-[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('SBB-Not').Show($toast)
+[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Gleis').Show($toast)
 """
     subprocess.run(
         ["powershell", "-NoProfile", "-Command", ps_script],
@@ -38,7 +38,7 @@ def send_notification(title: str, message: str, urgency: str = "normal") -> None
                 [
                     "notify-send",
                     "--urgency", urgency_map.get(urgency, "normal"),
-                    "--app-name", "SBB-Not",
+                    "--app-name", "Gleis",
                     title,
                     message,
                 ],
