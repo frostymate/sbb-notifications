@@ -21,7 +21,7 @@ Never miss your stop again! SBB-Not monitors your Google Calendar for SBB journe
 - 🔄 **Transfer alerts** — notified before you need to switch trains
 - ⏱️ **Real-time delays** — uses live data from transport.opendata.ch
 - 📅 **Adaptive polling** — polls faster as your trip approaches
-- 🖥️ **Cross-platform** — works on Linux (`notify-send`) and macOS (`osascript`)
+- 🖥️ **Cross-platform** — works on Windows (toast notifications), Linux (`notify-send`), and macOS (`osascript`)
 
 ## Setup
 
@@ -43,12 +43,34 @@ cp .env.example .env
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate
-pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib httpx python-dotenv
+source venv/bin/activate  # On Windows: .venv\Scripts\Activate.ps1
+pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib httpx python-dotenv tzdata
 python main.py
 ```
 
-On first run, it opens a browser for Google OAuth. After that, the token is cached.
+On first run, you'll be prompted to complete Google OAuth in the browser. After that, the token is cached.
+
+### Run in Background (Windows)
+
+To run SBB-Not automatically at login as a background service:
+
+```powershell
+# Register scheduled task (one-time setup)
+powershell -ExecutionPolicy Bypass -File .\install_task.ps1
+
+# Start immediately
+Start-ScheduledTask -TaskName "SBB-Not"
+```
+
+The task starts at every login, runs silently, and auto-restarts on failure.
+
+```powershell
+# Manage the task
+Get-ScheduledTask -TaskName "SBB-Not"          # Check status
+Stop-ScheduledTask -TaskName "SBB-Not"         # Stop
+Start-ScheduledTask -TaskName "SBB-Not"        # Start
+Unregister-ScheduledTask -TaskName "SBB-Not"   # Remove
+```
 
 ### 4. Add SBB Trips to Calendar
 

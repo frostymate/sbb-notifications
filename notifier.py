@@ -7,12 +7,32 @@ import logging
 logger = logging.getLogger("sbb-not")
 
 
+def _send_windows_toast(title: str, message: str) -> None:
+    """Send a Windows toast notification via PowerShell."""
+    ps_script = f"""
+[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
+$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
+$textNodes = $template.GetElementsByTagName('text')
+$textNodes.Item(0).AppendChild($template.CreateTextNode('{title.replace("'", "''")}')) > $null
+$textNodes.Item(1).AppendChild($template.CreateTextNode('{message.replace("'", "''")}')) > $null
+$toast = [Windows.UI.Notifications.ToastNotification]::new($template)
+[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('SBB-Not').Show($toast)
+"""
+    subprocess.run(
+        ["powershell", "-NoProfile", "-Command", ps_script],
+        check=True,
+        capture_output=True,
+    )
+
+
 def send_notification(title: str, message: str, urgency: str = "normal") -> None:
-    """Send a desktop notification. Works on Linux and macOS."""
+    """Send a desktop notification. Works on Windows, Linux, and macOS."""
     system = platform.system()
 
     try:
-        if system == "Linux":
+        if system == "Windows":
+            _send_windows_toast(title, message)
+        elif system == "Linux":
             urgency_map = {"low": "low", "normal": "normal", "critical": "critical"}
             subprocess.run(
                 [

@@ -85,7 +85,7 @@ class JourneyMonitor:
             # Platform changes
             if old.departure_platform and new.departure_platform and old.departure_platform != new.departure_platform:
                 send_notification(
-                    "⚠️ Platform change!",
+                    f"⚠️ {self.journey.origin} → {self.journey.destination}: Platform change!",
                     f"{new.train_type or ''} {new.train_number or ''} at {new.from_station}: "
                     f"Gl. {old.departure_platform} → Gl. {new.departure_platform}",
                     urgency="critical",
@@ -94,7 +94,7 @@ class JourneyMonitor:
 
             if old.arrival_platform and new.arrival_platform and old.arrival_platform != new.arrival_platform:
                 send_notification(
-                    "⚠️ Platform change!",
+                    f"⚠️ {self.journey.origin} → {self.journey.destination}: Platform change!",
                     f"Arrival at {new.to_station}: Gl. {old.arrival_platform} → Gl. {new.arrival_platform}",
                     urgency="critical",
                 )
@@ -106,7 +106,7 @@ class JourneyMonitor:
             prev_delay = self.notified_delays.get(delay_key, 0)
             if new_delay >= 3 and new_delay - prev_delay >= 3:
                 send_notification(
-                    "⏱️ Delay update",
+                    f"⏱️ {self.journey.origin} → {self.journey.destination}: Delay",
                     f"{new.train_type or ''} {new.train_number or ''} from {new.from_station}: "
                     f"+{new_delay} min delay",
                     urgency="critical",
@@ -133,7 +133,7 @@ class JourneyMonitor:
                         platform_info = self._format_platform(next_leg.departure_platform)
                         delay_info = f" (+{next_leg.departure_delay} min)" if next_leg.departure_delay else ""
                         send_notification(
-                            "🔄 Transfer coming up!",
+                            f"🔄 {self.journey.origin} → {self.journey.destination}: Transfer!",
                             f"Arriving at {leg.to_station}{self._format_platform(leg.arrival_platform)} in ~{int(time_until.total_seconds() / 60)} min.\n"
                             f"Next: {next_leg.train_type or ''} {next_leg.train_number or ''} → {next_leg.to_station}{platform_info}{delay_info}",
                             urgency="critical",
@@ -158,7 +158,7 @@ class JourneyMonitor:
                     platform_info = self._format_platform(final_leg.arrival_platform)
                     delay_info = f" (+{final_leg.arrival_delay} min late)" if final_leg.arrival_delay else ""
                     send_notification(
-                        "🎯 Arriving soon!",
+                        f"🎯 {self.journey.origin} → {self.journey.destination}: Arriving!",
                         f"{self.journey.destination}{platform_info} in ~{int(time_until.total_seconds() / 60)} min.{delay_info} "
                         f"Get ready to exit!",
                         urgency="critical",

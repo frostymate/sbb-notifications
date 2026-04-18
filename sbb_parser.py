@@ -69,18 +69,24 @@ def parse_title(title: str) -> tuple[str | None, str | None, str | None, str | N
         "Zürich HB - Bern" → ("Zürich HB", "Bern", None, None)
         "IC 708 Zürich HB - Bern" → ("Zürich HB", "Bern", "IC", "708")
         "S8 Zürich HB - Winterthur" → ("Zürich HB", "Winterthur", "S", "8")
+        "16:38 Zürich HB - Bern" → ("Zürich HB", "Bern", None, None)
     """
+    cleaned = title.strip()
+
+    # Strip leading time prefix like "16:38 " or "16:38  "
+    cleaned = re.sub(r"^\d{1,2}:\d{2}\s+", "", cleaned)
+
     # Try: "[TrainType] [Number] Origin - Destination"
     m = re.match(
         rf"^({TRAIN_TYPES})\s*(\d+)?\s*(.+?)\s*[-–—→]\s*(.+)$",
-        title.strip(),
+        cleaned,
         re.IGNORECASE,
     )
     if m:
         return m.group(3).strip(), m.group(4).strip(), m.group(1), m.group(2)
 
     # Try: "Origin - Destination" (no train info)
-    m = re.match(r"^(.+?)\s*[-–—→]\s*(.+)$", title.strip())
+    m = re.match(r"^(.+?)\s*[-–—→]\s*(.+)$", cleaned)
     if m:
         return m.group(1).strip(), m.group(2).strip(), None, None
 
