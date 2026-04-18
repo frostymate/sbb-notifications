@@ -117,25 +117,25 @@ In the SBB app, after searching a route, tap **"Add to Calendar"**. Gleis will d
 
 #### Step 1 — Search for connections
 
-![Search connections](docs/images/first_screen.jpg)
+<img src="docs/images/first_screen.jpg" alt="Search connections" width="300">
 
 Open the SBB app and search for train connections from A to B (e.g. **Lausanne → Zürich HB**).
 
 #### Step 2 — Open the connection menu
 
-![Connection menu](docs/images/second_screen.jpg)
+<img src="docs/images/second_screen.jpg" alt="Connection menu" width="300">
 
 Tap on a connection to see its details, then tap the **⋯ (three dots)** button in the top-right corner.
 
 #### Step 3 — Add to calendar
 
-![Add to calendar](docs/images/third_screen.jpg)
+<img src="docs/images/third_screen.jpg" alt="Add to calendar" width="300">
 
 In the bottom sheet, tap **"Add to calendar"** to export the trip to your phone's calendar.
 
 #### Step 4 — Google Calendar event
 
-![Google Calendar event](docs/images/fourth_screen.jpg)
+<img src="docs/images/fourth_screen.jpg" alt="Google Calendar event" width="300">
 
 The calendar event is pre-filled with the trip details (title, departure/arrival times, timezone). Save it — Gleis will pick it up automatically.
 
