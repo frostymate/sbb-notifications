@@ -1,7 +1,10 @@
 .env
 token.pickle
 credentials.json
+ms_token_cache.json
 __pycache__/
 venv/
+.venv/
 *.pyc
 .DS_Store
+.pytest_cache/

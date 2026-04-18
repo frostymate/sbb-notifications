@@ -1,7 +1,7 @@
 $taskName = "Gleis"
-$pythonExe = "c:\Users\kyangzhang\sbb-notifications\.venv\Scripts\python.exe"
-$script = "c:\Users\kyangzhang\sbb-notifications\main.py"
-$workDir = "c:\Users\kyangzhang\sbb-notifications"
+$workDir = Split-Path -Parent $PSScriptRoot
+$pythonExe = Join-Path $workDir ".venv\Scripts\python.exe"
+$script = Join-Path $workDir "main.py"
 Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
 $action = New-ScheduledTaskAction -Execute $pythonExe -Argument $script -WorkingDirectory $workDir
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
