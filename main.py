@@ -12,9 +12,9 @@ from zoneinfo import ZoneInfo
 
 from config import (
     POLL_IDLE, POLL_APPROACHING, POLL_ACTIVE,
-    NOTIFY_MINUTES_BEFORE, TIMEZONE,
+    NOTIFY_MINUTES_BEFORE, TIMEZONE, CALENDAR_BACKEND,
 )
-from calendar_client import get_calendar_service, fetch_upcoming_events
+from calendar_client import get_calendar_service, fetch_upcoming_events as google_fetch_events
 from sbb_parser import parse_event, Journey, Leg
 from transport_client import fetch_connection, find_best_connection, connection_to_legs
 from notifier import send_notification
@@ -175,8 +175,9 @@ class SBBNotDaemon:
     """Main daemon — polls calendar, manages journey monitors."""
 
     def __init__(self):
-        self.calendar_service = None
+        self.calendar_service = None  # used for Google backend only
         self.monitors: dict[str, JourneyMonitor] = {}  # event_id → monitor
+        self.backend = CALENDAR_BACKEND.lower()
 
     def _get_poll_interval(self, now: datetime) -> int:
         """Adaptive polling: faster when a trip is near."""
@@ -196,7 +197,11 @@ class SBBNotDaemon:
     async def poll_calendar(self) -> None:
         """Check calendar for new SBB events."""
         try:
-            events = fetch_upcoming_events(self.calendar_service)
+            if self.backend == "teams":
+                from teams_calendar_client import fetch_upcoming_events as teams_fetch_events
+                events = teams_fetch_events()
+            else:
+                events = google_fetch_events(self.calendar_service)
         except Exception as e:
             logger.error(f"Calendar poll failed: {e}")
             return
@@ -219,15 +224,25 @@ class SBBNotDaemon:
     async def run(self) -> None:
         """Main loop."""
         logger.info("🚆 Gleis starting...")
-        logger.info("Authenticating with Google Calendar...")
 
-        try:
-            self.calendar_service = get_calendar_service()
-        except FileNotFoundError as e:
-            logger.error(str(e))
-            sys.exit(1)
+        if self.backend == "teams":
+            logger.info("Authenticating with Microsoft Teams / Outlook calendar...")
+            try:
+                from teams_calendar_client import get_graph_headers
+                get_graph_headers()  # triggers auth if needed
+            except Exception as e:
+                logger.error(f"Microsoft auth failed: {e}")
+                sys.exit(1)
+            logger.info("✅ Connected to Microsoft Graph (Teams/Outlook calendar)")
+        else:
+            logger.info("Authenticating with Google Calendar...")
+            try:
+                self.calendar_service = get_calendar_service()
+            except FileNotFoundError as e:
+                logger.error(str(e))
+                sys.exit(1)
+            logger.info("✅ Connected to Google Calendar")
 
-        logger.info("✅ Connected to Google Calendar")
         logger.info(f"Watching for SBB events (notify {NOTIFY_MINUTES_BEFORE} min before stops)")
         logger.info("Press Ctrl+C to stop\n")
 
